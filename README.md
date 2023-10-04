@@ -13,7 +13,7 @@ Once securely stored within Kubernetes, these secrets can be conveniently inject
 
 ## Requirements
 
-**Data Security**: The solution must ensure the security of sensitive data such as passwords, tokens, and keys. It should encrypt secrets both at rest and in transit to protect against unauthorized access and data breaches.
+**Data Security**: The solution must ensure the security of sensitive data such as passwords, tokens, and keys. It should encrypt secrets both at rest and in transit to protect against unauthorized access and data breaches[1].
 **Access Control**: Implement fine-grained access control mechanisms to restrict who can access and modify secrets. Role-Based Access Control (RBAC) should be supported to define permissions.
 **Audit Trail**: Enable auditing capabilities to track changes and access to secrets. This helps in compliance and troubleshooting efforts.
 **Ease of Integration**: The solution should seamlessly integrate with Kubernetes clusters and existing tools commonly used in the Kubernetes ecosystem.
@@ -70,6 +70,8 @@ Certainly, here are two options to help your client improve the way they save an
 * Supports various external secret management solutions.
 * Requires minimal changes to the existing workflow.
 
+Source: [Kubernetes External Secrets](https://github.com/external-secrets/external-secrets "Kubernetes External Secrets")
+
 #### Kubernetes Secrets Store CSI Driver:
 
 **Implementation:** Utilize the Kubernetes Secrets Store CSI Driver to enable secret retrieval from external secret stores without modifying application code.
@@ -86,6 +88,8 @@ Certainly, here are two options to help your client improve the way they save an
 * Provides dynamic, on-demand secret retrieval.
 * Supports various external secret stores.
 * Requires minimal code changes.
+
+Source: [Kubernetes Secrets Store CSI Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver "Kubernetes Secrets Store CSI Driver")
 
 Each of these options offers improved secret management while considering your client's small team and limited capacity for self-hosted solutions. The choice depends on their preferences and willingness to adopt external secret management solutions or implement GitOps practices.
 
