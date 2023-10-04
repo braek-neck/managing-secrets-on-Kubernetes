@@ -31,7 +31,7 @@ These requirements are crucial for selecting a secure and effective secret manag
 
 ### Secret store
 
-Certainly, here are two options to improve the way your client saves and manages secrets.
+Here are two options to improve the way your client saves and manages secrets.
 
 **AWS Secrets Manager**: Utilize AWS Secrets Manager, a managed service designed for storing and rotating secrets securely. Your client can store database passwords and other sensitive data as secrets in AWS Secrets Manager. Then, they can grant specific IAM roles or permissions to access these secrets only to the necessary applications or pods. This eliminates the need to store secrets in application configuration files on GitHub.
 
@@ -58,7 +58,7 @@ Both options provide secure and scalable ways to manage secrets, and they can in
 
 ### Secrets managment in Kubernetes
 
-Certainly, here are two options to help your client improve the way they save and manage secrets in their Kubernetes on AWS (EKS) environment while considering their small team and limited capacity for self-hosted solutions:
+Here are two options to help your client improve the way they save and manage secrets in their Kubernetes on AWS (EKS) environment while considering their small team and limited capacity for self-hosted solutions.
 
 #### Kubernetes External Secrets
 
