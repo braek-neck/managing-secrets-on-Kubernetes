@@ -63,6 +63,7 @@ Here are two options to help your client improve the way they save and manage se
 #### Kubernetes External Secrets
 
 **Implementation**: Implement Kubernetes External Secrets to centralize secret management while keeping secrets in external stores.
+
 **Workflow**:
 * Store secrets securely in an external secret store (e.g., AWS Secrets Manager or HashiCorp Vault).
 * Configure Kubernetes External Secrets to fetch secrets from the external store and inject them as Kubernetes Secrets into the application pods.
