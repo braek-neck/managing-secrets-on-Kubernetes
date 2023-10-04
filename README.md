@@ -14,10 +14,15 @@ Once securely stored within Kubernetes, these secrets can be conveniently inject
 ## Requirements
 
 **Data Security**: The solution must ensure the security of sensitive data such as passwords, tokens, and keys. It should encrypt secrets both at rest and in transit to protect against unauthorized access and data breaches[1].
+
 **Access Control**: Implement fine-grained access control mechanisms to restrict who can access and modify secrets. Role-Based Access Control (RBAC) should be supported to define permissions.
+
 **Audit Trail**: Enable auditing capabilities to track changes and access to secrets. This helps in compliance and troubleshooting efforts.
+
 **Ease of Integration**: The solution should seamlessly integrate with Kubernetes clusters and existing tools commonly used in the Kubernetes ecosystem.
+
 **Secure Storage Backend**: Utilize secure storage backends for storing secrets, which may include cloud-based solutions like AWS KMS or HashiCorp Vault.
+
 **Secret Rotation**: Support for secret rotation is essential to regularly update credentials and reduce the attack surface.
 
 These requirements are crucial for selecting a secure and effective secret management and storage solution in a Kubernetes environment.
