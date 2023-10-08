@@ -31,30 +31,28 @@ These requirements are crucial for selecting a secure and effective secret manag
 
 ### Secret store
 
-Here are two options to improve the way your client saves and manages secrets.
+Here are three options to improve the way your client saves and manages secrets.
 
-**AWS Secrets Manager**: Utilize AWS Secrets Manager, a managed service designed for storing and rotating secrets securely. Your client can store database passwords and other sensitive data as secrets in AWS Secrets Manager. Then, they can grant specific IAM roles or permissions to access these secrets only to the necessary applications or pods. This eliminates the need to store secrets in application configuration files on GitHub.
+#### AWS Secrets Manager:
 
-**Advantages**:
-
-* Managed and secure secret storage.
-* Integration with AWS services, including EKS.
-* Granular access control through IAM roles.
-
+**Optimal for**: AWS-native applications, ease of integration with other AWS services.
+**Why**: Secrets Manager is a managed service specifically designed for storing and managing secrets, such as database passwords and API keys. It provides rotation and auditing capabilities, making it suitable for applications running on AWS that require seamless integration with AWS services. Secrets Manager simplifies secret management tasks, but it's primarily focused on AWS-native applications and may have limitations for non-AWS resources.
 Source: [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/ "AWS Secrets Manager")
 
-**HashiCorp Vault**: HashiCorp Vault is an open-source tool for managing secrets and protecting sensitive data. Your client can set up Vault to store and manage secrets, and Kubernetes can be configured to retrieve secrets from Vault dynamically. Vault offers various authentication methods and access controls, making it a robust solution for secret management.
+#### AWS Systems Manager Parameter Store:
 
-**Advantages**:
+**Optimal for**: Storing configuration data and lightweight secret management within AWS.
+**Why**: Parameter Store is a part of AWS Systems Manager and is primarily designed for storing configuration parameters, but it can also be used to store lightweight secrets. It's suitable when you need to centralize configuration data for various AWS resources. While it can handle secrets, it lacks some of the advanced secret management features found in dedicated solutions like Secrets Manager and Vault.
+Source: [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html)
 
-* Centralized and secure secret management.
-* Integration with Kubernetes through the Kubernetes Auth Method.
-* Support for various authentication mechanisms.
+#### HashiCorp Vault:
 
+**Optimal for**: Comprehensive secret management across multi-cloud or hybrid environments.
+**Why**: Vault is a highly versatile and secure secret management tool that works across different cloud providers and on-premises environments. It offers advanced features like dynamic secrets, fine-grained access control, and support for multiple authentication methods. Vault is an excellent choice when you have a diverse set of resources, including those outside of AWS, and require a centralized, robust secret management solution.
 Source: [HashiCorp Vault](https://www.vaultproject.io/ "HashiCorp Vault")
 
-Both options provide secure and scalable ways to manage secrets, and they can integrate well with Kubernetes on AWS while reducing the risk associated with storing sensitive data in code repositories. Your client can choose the one that aligns best with their requirements and capacity.
 
+All options provide secure and scalable ways to manage secrets, and they can integrate well with Kubernetes on AWS while reducing the risk associated with storing sensitive data in code repositories. Your client can choose the one that aligns best with their requirements and capacity.
 
 ### Secrets managment in Kubernetes
 
@@ -108,7 +106,56 @@ If you primarily use AWS services and value simplicity and automation, AWS Secre
 
 When deciding between Kubernetes External Secrets and Kubernetes Secrets Store CSI, both operators offer similar functionality. Ultimately, the choice comes down to personal preference and the specific features needed. However, in their documentation, Amazon suggests utilizing the AWS Secrets Manager + Kubernetes Secrets Store CSI Driver bundle. Therefore, we would be to recommend using this particular bundle.
 
+## Implementation
+
+Learn about the bundle of AWS Secrets Manager and Kubernetes Secrets Store CSI Driver.
+
+##### Step 1.
+First of all, we need to install two components in our cluster.
+* [Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/ "Kubernetes Secrets Store CSI Driver")
+* [Config Provider for Secret Store CSI Driver](https://github.com/aws/secrets-store-csi-driver-provider-aws/tree/main "Config Provider for Secret Store CSI Driver")
+
+The installation process is briefly described [here](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html "here"). We will not describe it in detail.
+
+##### Step 2.
+Now create a test secret:
+
+    aws --region "$REGION" secretsmanager  create-secret --name MySecret --secret-string '{"username":"memeuser", "password":"hunter2"}'
+
+Now create the SecretProviderClass which tells the AWS provider which secrets are to be mounted in the pod.
+
+    apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+    kind: SecretProviderClass
+    metadata:
+      name: nginx-deployment-aws-secrets
+    spec:
+      provider: aws
+      parameters:
+        objects: |
+            - objectName: "MySecret"
+              objectType: "secretsmanager"
 
 
+Finally we can deploy our pod.
+In the Kubernetes manifest, we define a volume and specify the secret provider class. Finally, we mount the volume in the pod.
+
+          ............
+		  volumes:
+          - name: secrets-store-inline
+            csi:
+              driver: secrets-store.csi.k8s.io
+              readOnly: true
+              volumeAttributes:
+                secretProviderClass: "nginx-deployment-aws-secrets"
+          ...............
+            volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+
+To verify the secret has been mounted properly, See the example below:
+
+    kubectl exec -it $(kubectl get pods | awk '/nginx-deployment/{print $1}' | head -1) cat /mnt/secrets-store/MySecret; echo
 
 
+This is a small example of how to use the presented bundle. We can even translate secrets into Kubernetes POD environment variables.
